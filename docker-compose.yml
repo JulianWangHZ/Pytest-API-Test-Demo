@@ -1,0 +1,57 @@
+version: "3.8"
+
+services:
+  # API testing service
+  api-tests:
+    build: .
+    container_name: fakestore-api-tests
+    volumes:
+      - ./reports:/app/reports
+      - ./test_data:/app/test_data
+    environment:
+      - ENVIRONMENT=staging
+      - PYTHONPATH=/app
+    command: >
+      sh -c "pytest --alluredir=reports/allure/results 
+             --html=reports/html/report.html 
+             --self-contained-html 
+             --cov=utils 
+             --cov=config 
+             --cov-report=html:reports/coverage 
+             -v"
+    networks:
+      - test-network
+
+  # Allure service for report viewing
+  allure:
+    image: "frankescobar/allure-docker-service"
+    container_name: allure-server
+    environment:
+      CHECK_RESULTS_EVERY_SECONDS: 3
+      KEEP_HISTORY: 1
+    ports:
+      - "5050:5050"
+    volumes:
+      - ./reports/allure/results:/app/allure-results
+      - ./reports/allure/reports:/app/default-reports
+    networks:
+      - test-network
+    depends_on:
+      - api-tests
+
+  # Optional: Selenium Grid for UI testing (if needed in future)
+  # selenium-hub:
+  #   image: selenium/hub:4.15.0
+  #   container_name: selenium-hub
+  #   ports:
+  #     - "4444:4444"
+  #   networks:
+  #     - test-network
+
+networks:
+  test-network:
+    driver: bridge
+
+volumes:
+  allure-results:
+  allure-reports:

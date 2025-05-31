@@ -1,0 +1,41 @@
+{
+  "products": {
+    "get_all": "/products",
+    "get_by_id": "/products/{id}",
+    "create": "/products",
+    "update": "/products/{id}",
+    "patch": "/products/{id}",
+    "delete": "/products/{id}",
+    "categories": "/products/categories",
+    "by_category": "/products/category/{category}",
+    "limit": "/products?limit={limit}",
+    "sort": "/products?sort={sort}",
+    "limit_sort": "/products?limit={limit}&sort={sort}"
+  },
+  "users": {
+    "get_all": "/users",
+    "get_by_id": "/users/{id}",
+    "create": "/users",
+    "update": "/users/{id}",
+    "patch": "/users/{id}",
+    "delete": "/users/{id}",
+    "limit": "/users?limit={limit}",
+    "sort": "/users?sort={sort}",
+    "limit_sort": "/users?limit={limit}&sort={sort}"
+  },
+  "carts": {
+    "get_all": "/carts",
+    "get_by_id": "/carts/{id}",
+    "create": "/carts",
+    "update": "/carts/{id}",
+    "patch": "/carts/{id}",
+    "delete": "/carts/{id}",
+    "user_carts": "/carts/user/{user_id}",
+    "date_range": "/carts?startdate={start}&enddate={end}",
+    "limit": "/carts?limit={limit}",
+    "sort": "/carts?sort={sort}"
+  },
+  "auth": {
+    "login": "/auth/login"
+  }
+}

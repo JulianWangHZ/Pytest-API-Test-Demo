@@ -1,0 +1,103 @@
+{
+  "test_cases": [
+    {
+      "test_type": "positive",
+      "name": "valid_product_creation",
+      "description": "Valid product data for creation",
+      "data": {
+        "title": "Test Product",
+        "price": 19.99,
+        "description": "A test product description",
+        "image": "https://example.com/image.jpg",
+        "category": "electronics"
+      },
+      "expected_fields": [
+        "id",
+        "title",
+        "price",
+        "description",
+        "image",
+        "category"
+      ]
+    },
+    {
+      "test_type": "positive",
+      "name": "valid_product_update",
+      "description": "Valid product data for update",
+      "data": {
+        "title": "Updated Test Product",
+        "price": 29.99,
+        "description": "An updated test product description",
+        "image": "https://example.com/updated-image.jpg",
+        "category": "electronics"
+      },
+      "expected_fields": [
+        "id",
+        "title",
+        "price",
+        "description",
+        "image",
+        "category"
+      ]
+    },
+    {
+      "test_type": "boundary",
+      "name": "product_with_minimum_price",
+      "description": "Product with minimum valid price",
+      "data": {
+        "title": "Minimum Price Product",
+        "price": 0.01,
+        "description": "Product with minimum price",
+        "image": "https://example.com/min-price.jpg",
+        "category": "electronics"
+      }
+    },
+    {
+      "test_type": "boundary",
+      "name": "product_with_maximum_price",
+      "description": "Product with high price",
+      "data": {
+        "title": "Expensive Product",
+        "price": 99999.99,
+        "description": "Very expensive product",
+        "image": "https://example.com/expensive.jpg",
+        "category": "electronics"
+      }
+    },
+    {
+      "test_type": "negative",
+      "name": "product_with_empty_title",
+      "description": "Product with empty title",
+      "data": {
+        "title": "",
+        "price": 19.99,
+        "description": "Product with empty title",
+        "image": "https://example.com/image.jpg",
+        "category": "electronics"
+      },
+      "expected_status": 400
+    },
+    {
+      "test_type": "negative",
+      "name": "product_with_negative_price",
+      "description": "Product with negative price",
+      "data": {
+        "title": "Negative Price Product",
+        "price": -10.99,
+        "description": "Product with negative price",
+        "image": "https://example.com/image.jpg",
+        "category": "electronics"
+      },
+      "expected_status": 400
+    }
+  ],
+  "categories": [
+    "electronics",
+    "jewelery",
+    "men's clothing",
+    "women's clothing"
+  ],
+  "sort_options": ["asc", "desc"],
+  "valid_limits": [1, 5, 10, 20],
+  "invalid_limits": [-1, 0, "invalid"]
+}

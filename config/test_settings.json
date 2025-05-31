@@ -1,0 +1,36 @@
+{
+  "data_generation": {
+    "faker": {
+      "locale": "zh_TW",
+      "seed": 12345,
+      "providers": ["internet", "commerce", "person", "date_time"]
+    },
+    "dynamic_data": true,
+    "data_cleanup": true
+  },
+  "validation": {
+    "strict_schema": true,
+    "allow_additional_properties": false,
+    "status_code_validation": true,
+    "content_type_validation": true
+  },
+  "reporting": {
+    "allure_enabled": true,
+    "html_report": true,
+    "junit_xml": true,
+    "detailed_logs": true,
+    "performance_metrics": true
+  },
+  "auth": {
+    "test_credentials": {
+      "username": "mor_2314",
+      "password": "83r5^_"
+    },
+    "token_expiry": 3600
+  },
+  "retry_settings": {
+    "retry_on_status_codes": [500, 502, 503, 504],
+    "retry_on_exceptions": ["ConnectionError", "Timeout"],
+    "exponential_backoff": true
+  }
+}

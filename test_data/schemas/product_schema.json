@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Product Schema",
+  "description": "Schema for validating product objects from FakeStore API",
+  "required": [
+    "id",
+    "title",
+    "price",
+    "description",
+    "category",
+    "image",
+    "rating"
+  ],
+  "properties": {
+    "id": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Unique product identifier"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Product title"
+    },
+    "price": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Product price"
+    },
+    "description": {
+      "type": "string",
+      "description": "Product description"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["electronics", "jewelery", "men's clothing", "women's clothing"],
+      "description": "Product category"
+    },
+    "image": {
+      "type": "string",
+      "format": "uri",
+      "description": "Product image URL"
+    },
+    "rating": {
+      "type": "object",
+      "required": ["rate", "count"],
+      "properties": {
+        "rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5,
+          "description": "Average rating"
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of ratings"
+        }
+      }
+    }
+  }
+}

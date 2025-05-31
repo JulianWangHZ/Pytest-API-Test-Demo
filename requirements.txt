@@ -1,0 +1,31 @@
+# Core testing framework
+pytest
+pytest-html
+pytest-xdist
+pytest-cov
+pytest-timeout
+
+# HTTP client
+requests
+urllib3
+
+# Data validation and processing
+jsonschema
+pydantic
+
+# Allure reporting
+allure-pytest
+allure-python-commons
+
+# Utilities
+python-dotenv
+faker
+jinja2
+
+# Development tools
+black
+flake8
+mypy
+pre-commit
+
+

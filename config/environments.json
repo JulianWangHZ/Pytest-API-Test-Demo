@@ -1,0 +1,52 @@
+{
+  "staging": {
+    "base_url": "https://fakestoreapi.com",
+    "timeout": 30,
+    "retry_count": 3,
+    "retry_delay": 2,
+    "headers": {
+      "Content-Type": "application/json",
+      "User-Agent": "FakeStore-API-Test-Suite/1.0-staging",
+      "Accept": "application/json"
+    },
+    "logging": {
+      "level": "INFO",
+      "console_enabled": true,
+      "file_enabled": true
+    },
+    "performance": {
+      "max_response_time": 5.0,
+      "concurrent_requests": 10
+    },
+    "test_execution": {
+      "parallel_workers": 4,
+      "max_retries": 2,
+      "timeout_per_test": 90
+    }
+  },
+  "prod": {
+    "base_url": "https://fakestoreapi.com",
+    "timeout": 20,
+    "retry_count": 5,
+    "retry_delay": 3,
+    "headers": {
+      "Content-Type": "application/json",
+      "User-Agent": "FakeStore-API-Test-Suite/1.0-prod",
+      "Accept": "application/json"
+    },
+    "logging": {
+      "level": "WARNING",
+      "console_enabled": false,
+      "file_enabled": true
+    },
+    "performance": {
+      "max_response_time": 2.0,
+      "concurrent_requests": 15
+    },
+    "test_execution": {
+      "parallel_workers": 6,
+      "max_retries": 3,
+      "timeout_per_test": 60
+    }
+  }
+}
