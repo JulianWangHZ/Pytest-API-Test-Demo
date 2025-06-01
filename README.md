@@ -8,6 +8,8 @@ This is a Python-based API testing framework that uses pytest as the test runner
 
 ![Test Results Demo](assets/test_results.gif)
 
+[🔗 View Latest Test Report](https://julianwanghz.github.io/Pytest-API-Test-Demo/allure-report/)
+
 ## 📋 Key Features
 
 - **Modular Design**: Clear architectural separation for easy maintenance and scalability
