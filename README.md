@@ -2,6 +2,12 @@
 
 A professional, comprehensive API automation testing architecture specifically designed for testing the [FakeStore API](https://fakestoreapi.com/docs).
 
+## 📋 Project Overview
+
+This is a Python-based API testing framework that uses pytest as the test runner and integrates with the Allure reporting system. The framework supports multi-environment configuration, data-driven testing, parameterized testing, and provides a complete CI/CD integration solution.
+
+![Test Results Demo](assets/test_results.gif)
+
 ## 📋 Key Features
 
 - **Modular Design**: Clear architectural separation for easy maintenance and scalability
