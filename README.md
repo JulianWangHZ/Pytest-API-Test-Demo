@@ -12,6 +12,7 @@ A professional, comprehensive API automation testing architecture specifically d
 - **Complete HTTP Support**: GET, POST, PUT, PATCH, DELETE methods
 - **Auto Retry Mechanism**: Intelligent retry for network errors
 - **Parallel Execution**: Support for pytest-xdist parallel testing
+- **Docker Support**: Containerized testing environment for consistency
 
 ## 🏗️ Project Architecture
 
@@ -54,155 +55,163 @@ pytest-api-demo/
 └── README.md                  # Project documentation
 ```
 
-## 🚀 Quick Start
+## 🚀 Quick Start Guide
 
-### 1. Install Dependencies
+### 1. Clone Repository
 
 ```bash
+git clone <your-repo-url>
+cd pytest-api-demo
+```
+
+### 2. Choose Execution Method
+
+#### Option A: Docker (Recommended)
+
+```bash
+# One-click test execution
+make docker-test
+
+# View test reports
+ls -la reports/
+```
+
+#### Option B: Local Development
+
+```bash
+# Install dependencies (requires virtual environment on macOS)
+python3 -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
-```
 
-### 2. Run Tests
-
-```bash
-# Run all tests
-pytest
-
-# Run smoke tests
+# Run tests
 pytest -m smoke
-
-# Run product-related tests
-pytest -m products
-
-# Run tests in parallel
-pytest -n auto
-
-# Generate Allure report
-pytest --alluredir=reports/allure/results
-allure serve reports/allure/results
 ```
 
-## 🐳 Docker Usage
+## 🐳 Docker Usage (Recommended)
 
-This project supports Docker for containerized testing. You can run tests in a Docker environment without installing dependencies locally.
+### Why Use Docker?
+
+- ✅ **Environment Consistency**: Ensures all developers use the same testing environment
+- ✅ **No Local Dependencies**: No need to install Python dependencies locally
+- ✅ **Quick Deployment**: One-click build and run
+- ✅ **Isolated Environment**: Won't pollute your local development environment
 
 ### Build Docker Image
 
 ```bash
-# Build the Docker image
+# Build Docker image
 docker build -t fakestore-api-tests .
 
-# Or use Makefile
+# Or use Makefile (simpler)
 make docker-build
 ```
 
-### Run Tests in Docker Container
+### Running Tests
+
+#### 1. Using Makefile (Recommended)
 
 ```bash
-# Run tests with Docker (reports will be saved to ./reports)
+# Build and run all tests
+make docker-test
+
+# Build image only
+make docker-build
+```
+
+#### 2. Using Docker Commands
+
+```bash
+# Run all tests
 docker run --rm -v $(pwd)/reports:/app/reports fakestore-api-tests
 
-# Or use Makefile
-make docker-test
+# Run smoke tests
+docker run --rm -v $(pwd)/reports:/app/reports fakestore-api-tests pytest -m smoke -v
+
+# Run specific test file
+docker run --rm -v $(pwd)/reports:/app/reports fakestore-api-tests pytest tests/test_products.py -v
+
+# Run specific test case
+docker run --rm -v $(pwd)/reports:/app/reports fakestore-api-tests pytest tests/test_products.py::TestGetProducts::test_get_all_products -v
+
+# Run tests with specific markers
+docker run --rm -v $(pwd)/reports:/app/reports fakestore-api-tests pytest -m "products and positive" -v
 ```
 
-### Using Docker Compose
-
-The project includes a complete Docker Compose setup with Allure reporting server:
+### Common Test Commands
 
 ```bash
-# Start all services (tests + Allure server)
-docker-compose up --build
+# 1. Quick Smoke Tests (Basic functionality verification)
+docker run --rm -v $(pwd)/reports:/app/reports fakestore-api-tests pytest -m smoke -v
 
-# Run in background
-docker-compose up --build -d
+# 2. Complete Product API Tests
+docker run --rm -v $(pwd)/reports:/app/reports fakestore-api-tests pytest tests/test_products.py -v
 
-# Or use Makefile
-make docker-up
+# 3. Positive Test Cases
+docker run --rm -v $(pwd)/reports:/app/reports fakestore-api-tests pytest -m positive -v
+
+# 4. Negative Test Cases
+docker run --rm -v $(pwd)/reports:/app/reports fakestore-api-tests pytest -m negative -v
+
+# 5. Specific Test Method
+docker run --rm -v $(pwd)/reports:/app/reports fakestore-api-tests pytest tests/test_products.py::TestGetProducts::test_get_product_invalid_id -v
 ```
 
-### Accessing Allure Reports in Docker
+### Viewing Reports
+
+After test completion, reports are automatically saved to the `./reports` directory:
 
 ```bash
-# Start services and open Allure reports in browser
-make docker-allure
+# View generated reports
+ls -la reports/
 
-# Or manually access at: http://localhost:5050
-```
-
-### Docker Commands Overview
-
-```bash
-# Build image
-make docker-build
-
-# Run tests in container
-make docker-test
-
-# Start all services
-make docker-up
-
-# Stop all services
-make docker-down
-
-# Open Allure reports
-make docker-allure
-
-# Clean Docker resources
-make docker-clean
+# Reports directory structure
+reports/
+├── allure/          # Allure test reports
+├── html/            # HTML test reports
+├── coverage/        # Code coverage reports
+└── logs/            # Test logs
 ```
 
 ### Docker Environment Variables
 
-You can customize the test environment by setting environment variables:
-
 ```bash
-# Run with different environment
+# Specify test environment
 docker run --rm \
   -e ENVIRONMENT=staging \
+  -v $(pwd)/reports:/app/reports \
+  fakestore-api-tests pytest -m smoke -v
+
+# Specify base URL
+docker run --rm \
+  -e BASE_URL=https://fakestoreapi.com \
   -v $(pwd)/reports:/app/reports \
   fakestore-api-tests
 ```
 
 ## 🛠️ Environment Setup Options
 
-### Option 1: Local Development
+### Option 1: Docker (Recommended)
 
-```bash
-# Install Python dependencies
-pip install -r requirements.txt
+- **Use Cases**: Production environment, CI/CD, team collaboration
+- **Benefits**: Environment consistency, quick deployment, no dependency conflicts
+- **Commands**: `make docker-test` or `docker run ...`
 
-# Run tests locally
-pytest
-```
+### Option 2: Local Development
 
-### Option 2: Docker (Recommended for CI/CD)
+- **Use Cases**: Development debugging, IDE integration, quick testing
+- **Prerequisites**: Need to install dependencies first `pip install -r requirements.txt`
+- **Commands**: `pytest -m smoke`
 
-```bash
-# Build and run tests in Docker
-make docker-test
+### ❗ Important Notes
 
-# Or full stack with reporting
-make docker-up
-```
+**Docker and Local are Independent Environments**:
 
-### 3. Environment Configuration
+- Docker installs dependencies **inside the container** during build
+- Local environment needs to **separately install** dependencies to run pytest
+- Docker is recommended for environment consistency
 
-Modify `config/environments.json` to configure different environments:
-
-```json
-{
-  "staging": {
-    "base_url": "https://fakestoreapi.com",
-    "timeout": 30,
-    "headers": {
-      "Content-Type": "application/json"
-    }
-  }
-}
-```
-
-## 🧪 Test Types
+## 🧑🏻‍🎤 Test Types
 
 ### Pytest Markers
 
@@ -220,16 +229,16 @@ Modify `config/environments.json` to configure different environments:
 
 ```bash
 # Run smoke tests
-pytest -m smoke
+pytest -m smoke -v
 
 # Run positive test cases
-pytest -m positive
+pytest -m positive -v
 
 # Run product and user related tests
-pytest -m "products or users"
+pytest -m "products or users" -v
 
 # Exclude specific tests
-pytest -m "not slow"
+pytest -m "not slow" -v
 ```
 
 ## 📊 Test Reports
@@ -439,3 +448,19 @@ This is a complete, production-ready API testing framework that includes:
 - Scalable test data management
 - Modular design for maintainability
 - CI/CD integration ready
+
+## 📊 Test Markers and Usage
+
+```bash
+# Test type markers
+pytest -m smoke      # Smoke tests (basic functionality verification)
+pytest -m regression # Regression tests
+pytest -m positive   # Positive test cases
+pytest -m negative   # Negative test cases
+
+# API functionality markers
+pytest -m products   # Product-related APIs
+pytest -m users      # User-related APIs
+pytest -m carts      # Cart-related APIs
+pytest -m auth       # Authentication-related APIs
+```

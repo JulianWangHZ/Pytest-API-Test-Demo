@@ -1,5 +1,3 @@
-
-
 import pytest
 import allure
 import json
@@ -201,11 +199,19 @@ def capture_request_response():
         """
         with allure.step(f"{test_name}: {response.request.method} {response.url}"):
             # Attach request details
+            request_body = response.request.body
+            # Convert bytes to string for JSON serialization
+            if isinstance(request_body, bytes):
+                try:
+                    request_body = request_body.decode('utf-8')
+                except UnicodeDecodeError:
+                    request_body = str(request_body)
+            
             request_data = {
                 "method": response.request.method,
                 "url": str(response.url),
                 "headers": dict(response.request.headers),
-                "body": response.request.body
+                "body": request_body
             }
             
             allure.attach(
@@ -320,8 +326,9 @@ def pytest_runtest_logreport(report):
     if report.when == "call":
         if report.outcome == "failed":
             # Add failure details to Allure
+            failure_details = str(report.longrepr)
             allure.attach(
-                report.longrepr,
+                failure_details,
                 name="Failure Details",
                 attachment_type=allure.attachment_type.TEXT
             )
