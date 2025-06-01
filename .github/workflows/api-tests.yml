@@ -1,15 +1,11 @@
 name: API Tests
 
 on:
-  # 1. Trigger automatically when backend repo creates PR (via repository_dispatch)
-  repository_dispatch:
-    types: [backend-pr-created, backend-pr-updated]
-
-  # 2. Scheduled run - Daily execution (UTC 02:00, Taiwan 10:00)
+  # 1. Scheduled run - Daily execution (UTC 02:00, Taiwan 10:00)
   schedule:
     - cron: "0 2 * * *"
 
-  # 3. Manual trigger (can run on any branch)
+  # 2. Manual trigger (can run on any branch)
   workflow_dispatch:
     inputs:
       pytest_marks:
@@ -25,15 +21,6 @@ on:
         options:
           - staging
           - production
-
-  # 4. Also support PR trigger (for this repo's own PRs)
-  pull_request:
-    branches: ["main", "develop"]
-    types: [opened, synchronize, reopened]
-
-  # 5. Trigger on push to main branches
-  push:
-    branches: ["main"]
 
 # Permissions needed for GitHub Pages deployment
 permissions:
@@ -96,6 +83,13 @@ jobs:
             -v $(pwd)/reports:/app/reports \
             fakestore-api-tests pytest -m "$TEST_TYPE" -v --alluredir=/app/reports/allure/results
 
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.test-env }}-${{ matrix.test-suite }}
+          path: reports/allure/results
+          retention-days: 30
+
   manual-tests:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
@@ -139,47 +133,16 @@ jobs:
             -v $(pwd)/reports:/app/reports \
             fakestore-api-tests pytest -m "$TEST_TYPE" -v --alluredir=/app/reports/allure/results
 
-  pr-tests:
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Display trigger information
-        run: |
-          echo "Triggered by: ${{ github.event_name }}"
-          echo "Repository: ${{ github.repository }}"
-          echo "Branch: ${{ github.ref_name }}"
-          echo "Runner OS: ${{ runner.os }}"
-          echo "Commit SHA: ${{ github.sha }}"
-          echo "PR run with smoke tests"
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build Docker image
-        run: |
-          echo "Building Docker image..."
-          docker build -t fakestore-api-tests .
-          echo "Docker image built successfully"
-
-      - name: Create reports directory
-        run: |
-          mkdir -p reports/{allure/{results,reports},html,coverage,logs}
-          echo "Reports directory structure created"
-
-      - name: Run API Tests
-        run: |
-          echo "Running smoke tests on production environment..."
-          docker run --rm \
-            -e ENVIRONMENT=production \
-            -v $(pwd)/reports:/app/reports \
-            fakestore-api-tests pytest -m "smoke" -v --alluredir=/app/reports/allure/results
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-manual
+          path: reports/allure/results
+          retention-days: 30
 
   # Common steps for all jobs
   generate-report:
-    needs: [scheduled-tests, manual-tests, pr-tests]
+    needs: [scheduled-tests, manual-tests]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -224,13 +187,6 @@ jobs:
           echo "### Reports" >> $GITHUB_STEP_SUMMARY
           echo "- [Allure Report](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/allure-report/)" >> $GITHUB_STEP_SUMMARY
           echo "- [Test Artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
-
-      - name: Notify on failure
-        if: failure()
-        run: |
-          echo "API tests failed!"
-          echo "Please check the logs and Allure report for details."
-          # Can add Slack, Teams, Email notifications here
 
   # Additional parallel job: Generate test insights
   test-insights:
