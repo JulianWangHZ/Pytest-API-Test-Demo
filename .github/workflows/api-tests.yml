@@ -37,7 +37,7 @@ on:
 
 # Permissions needed for GitHub Pages deployment
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
   actions: read
@@ -48,9 +48,9 @@ env:
   ALLURE_RESULTS_PATH: allure-results
 
 jobs:
-  api-tests:
+  scheduled-tests:
+    if: github.event_name == 'schedule'
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         test-env: [production, staging]
@@ -59,8 +59,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.branch_ref || github.ref }}
 
       - name: Display trigger information
         run: |
@@ -69,17 +67,9 @@ jobs:
           echo "Branch: ${{ github.ref_name }}"
           echo "Runner OS: ${{ runner.os }}"
           echo "Commit SHA: ${{ github.sha }}"
-
-          if [[ "${{ github.event_name }}" == "repository_dispatch" ]]; then
-            echo "External trigger type: ${{ github.event.action }}"
-            echo "Payload: ${{ toJson(github.event.client_payload) }}"
-          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            echo "Pytest marks: ${{ github.event.inputs.pytest_marks }}"
-            echo "Environment: ${{ github.event.inputs.environment }}"
-            echo "Target branch: ${{ github.event.inputs.branch_ref || 'current' }}"
-          elif [[ "${{ github.event_name }}" == "schedule" ]]; then
-            echo "Scheduled run"
-          fi
+          echo "Scheduled run with matrix:"
+          echo "- Environment: ${{ matrix.test-env }}"
+          echo "- Test Suite: ${{ matrix.test-suite }}"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -95,59 +85,108 @@ jobs:
           mkdir -p reports/{allure/{results,reports},html,coverage,logs}
           echo "Reports directory structure created"
 
-      - name: Determine test scope
-        id: test-scope
-        run: |
-          # Determine test scope based on trigger type and inputs
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            TEST_TYPE="${{ github.event.inputs.pytest_marks }}"
-            ENVIRONMENT="${{ github.event.inputs.environment }}"
-          elif [[ "${{ github.event_name }}" == "repository_dispatch" ]]; then
-            # External trigger defaults to full test execution
-            TEST_TYPE="all"
-            ENVIRONMENT="production"
-          elif [[ "${{ github.event_name }}" == "schedule" ]]; then
-            # Scheduled task runs full tests
-            TEST_TYPE="all"
-            ENVIRONMENT="production"
-          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            # PR only runs smoke tests
-            TEST_TYPE="smoke"
-            ENVIRONMENT="production"
-          else
-            # Default runs smoke tests
-            TEST_TYPE="${{ matrix.test-suite }}"
-            ENVIRONMENT="production"
-          fi
-
-          echo "test_type=${TEST_TYPE}" >> $GITHUB_OUTPUT
-          echo "environment=${ENVIRONMENT}" >> $GITHUB_OUTPUT
-          echo "Test scope determined: ${TEST_TYPE} on ${ENVIRONMENT}"
-
       - name: Run API Tests
         env:
-          TEST_TYPE: ${{ steps.test-scope.outputs.test_type }}
-          ENVIRONMENT: ${{ steps.test-scope.outputs.environment }}
+          TEST_TYPE: ${{ matrix.test-suite }}
+          ENVIRONMENT: ${{ matrix.test-env }}
         run: |
           echo "Running tests with marks: $TEST_TYPE on $ENVIRONMENT environment..."
-
-          # Build pytest command with marks
-          if [[ "$TEST_TYPE" == "all" ]]; then
-            PYTEST_CMD="pytest -v --alluredir=/app/reports/allure/results"
-            echo "Running all tests..."
-          else
-            PYTEST_CMD="pytest -m \"$TEST_TYPE\" -v --alluredir=/app/reports/allure/results"
-            echo "Running tests with marks: $TEST_TYPE"
-          fi
-
-          # Execute the tests
           docker run --rm \
             -e ENVIRONMENT=$ENVIRONMENT \
             -v $(pwd)/reports:/app/reports \
-            fakestore-api-tests $PYTEST_CMD
+            fakestore-api-tests pytest -m "$TEST_TYPE" -v --alluredir=/app/reports/allure/results
+
+  manual-tests:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Display trigger information
+        run: |
+          echo "Triggered by: ${{ github.event_name }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Runner OS: ${{ runner.os }}"
+          echo "Commit SHA: ${{ github.sha }}"
+          echo "Manual run with options:"
+          echo "- Pytest marks: ${{ github.event.inputs.pytest_marks }}"
+          echo "- Environment: ${{ github.event.inputs.environment }}"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: |
+          echo "Building Docker image..."
+          docker build -t fakestore-api-tests .
+          echo "Docker image built successfully"
+
+      - name: Create reports directory
+        run: |
+          mkdir -p reports/{allure/{results,reports},html,coverage,logs}
+          echo "Reports directory structure created"
+
+      - name: Run API Tests
+        env:
+          TEST_TYPE: ${{ github.event.inputs.pytest_marks }}
+          ENVIRONMENT: ${{ github.event.inputs.environment }}
+        run: |
+          echo "Running tests with marks: $TEST_TYPE on $ENVIRONMENT environment..."
+          docker run --rm \
+            -e ENVIRONMENT=$ENVIRONMENT \
+            -v $(pwd)/reports:/app/reports \
+            fakestore-api-tests pytest -m "$TEST_TYPE" -v --alluredir=/app/reports/allure/results
+
+  pr-tests:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Display trigger information
+        run: |
+          echo "Triggered by: ${{ github.event_name }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Runner OS: ${{ runner.os }}"
+          echo "Commit SHA: ${{ github.sha }}"
+          echo "PR run with smoke tests"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: |
+          echo "Building Docker image..."
+          docker build -t fakestore-api-tests .
+          echo "Docker image built successfully"
+
+      - name: Create reports directory
+        run: |
+          mkdir -p reports/{allure/{results,reports},html,coverage,logs}
+          echo "Reports directory structure created"
+
+      - name: Run API Tests
+        run: |
+          echo "Running smoke tests on production environment..."
+          docker run --rm \
+            -e ENVIRONMENT=production \
+            -v $(pwd)/reports:/app/reports \
+            fakestore-api-tests pytest -m "smoke" -v --alluredir=/app/reports/allure/results
+
+  # Common steps for all jobs
+  generate-report:
+    needs: [scheduled-tests, manual-tests, pr-tests]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Generate Allure Report
-        if: always()
         uses: simple-elf/allure-report-action@master
         with:
           allure_results: reports/allure/results
@@ -157,7 +196,6 @@ jobs:
           keep_reports: 20
 
       - name: Deploy Allure Report to GitHub Pages
-        if: always()
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -168,10 +206,9 @@ jobs:
           user_email: "github-actions[bot]@users.noreply.github.com"
 
       - name: Upload Test Results
-        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results-${{ matrix.test-suite }}-${{ github.run_number }}
+          name: test-results-${{ github.run_number }}
           path: |
             reports/allure/results
             reports/html
@@ -179,13 +216,10 @@ jobs:
           retention-days: 30
 
       - name: Test Results Summary
-        if: always()
         run: |
           echo "## API Test Results Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **Trigger**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Pytest Marks**: ${{ steps.test-scope.outputs.test_type }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Environment**: ${{ steps.test-scope.outputs.environment }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -203,7 +237,7 @@ jobs:
   # Additional parallel job: Generate test insights
   test-insights:
     runs-on: ubuntu-latest
-    needs: api-tests
+    needs: generate-report
     if: always()
 
     steps:
