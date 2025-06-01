@@ -25,10 +25,6 @@ on:
         options:
           - staging
           - production
-      branch_ref:
-        description: "Branch to test against (leave empty for current branch)"
-        required: false
-        default: ""
 
   # 4. Also support PR trigger (for this repo's own PRs)
   pull_request:
