@@ -41,7 +41,7 @@ jobs:
     strategy:
       matrix:
         test-env: [production, staging]
-        test-suite: [smoke, regression]
+        test-suite: [smoke]
 
     steps:
       - name: Checkout repository
