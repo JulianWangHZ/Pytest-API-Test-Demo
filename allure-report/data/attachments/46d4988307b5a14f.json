@@ -1,0 +1,12 @@
+{
+  "method": "GET",
+  "url": "https://fakestoreapi.com/products?limit=1",
+  "headers": {
+    "User-Agent": "FakeStore-API-Test-Suite/1.0-staging",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept": "application/json",
+    "Connection": "keep-alive",
+    "Content-Type": "application/json"
+  },
+  "body": null
+}

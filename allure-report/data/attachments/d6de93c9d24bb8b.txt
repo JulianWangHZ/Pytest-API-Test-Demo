@@ -1,0 +1,4 @@
+Response validator initialized
+Status code validation passed: 200
+Content type validation passed: application/json
+Response time validation passed: 0.170s

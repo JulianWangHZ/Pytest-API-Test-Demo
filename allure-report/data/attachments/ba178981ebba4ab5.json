@@ -1,0 +1,26 @@
+{
+  "status_code": 200,
+  "headers": {
+    "Date": "Sat, 14 Jun 2025 03:08:35 GMT",
+    "Content-Type": "application/json; charset=utf-8",
+    "Transfer-Encoding": "chunked",
+    "Connection": "keep-alive",
+    "Access-Control-Allow-Origin": "*",
+    "Etag": "W/\"3e-cdq81BKoKIRIQmboBVN84Vj+vkM\"",
+    "X-Powered-By": "Express",
+    "Cf-Cache-Status": "DYNAMIC",
+    "Nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+    "Report-To": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=7txvBAdwKxUOh3S1pnNbNl7VTcQEDNGxufQ11POMMhDpM0dks3WQFNRTUqsEwlZ0XS7OZEAnVxn41VeMFu6EheuAvPH6HJFspLYlFIqGYz4%3D\"}]}",
+    "Content-Encoding": "gzip",
+    "Server": "cloudflare",
+    "CF-RAY": "94f69fc27c335836-IAD",
+    "alt-svc": "h3=\":443\"; ma=86400"
+  },
+  "response_time_seconds": 0.169213,
+  "body": [
+    "electronics",
+    "jewelery",
+    "men's clothing",
+    "women's clothing"
+  ]
+}

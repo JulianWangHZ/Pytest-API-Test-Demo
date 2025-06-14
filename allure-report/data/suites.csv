@@ -1,0 +1,6 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"Test getting all product categories","111","Get all categories","tests","Sat Jun 14 03:08:38 GMT 2025","passed","Sat Jun 14 03:08:39 GMT 2025","TestProductCategories","test_products","",""
+"Test getting limited number of products","113","Get products with limit","tests","Sat Jun 14 03:08:38 GMT 2025","passed","Sat Jun 14 03:08:38 GMT 2025","TestGetProducts","test_products","",""
+"Test getting limited number of products","111","Get products with limit","tests","Sat Jun 14 03:08:38 GMT 2025","passed","Sat Jun 14 03:08:38 GMT 2025","TestGetProducts","test_products","",""
+"Test getting limited number of products","112","Get products with limit","tests","Sat Jun 14 03:08:38 GMT 2025","passed","Sat Jun 14 03:08:38 GMT 2025","TestGetProducts","test_products","",""
+"Test getting all products from the API","173","Get all products successfully","tests","Sat Jun 14 03:08:38 GMT 2025","passed","Sat Jun 14 03:08:38 GMT 2025","TestGetProducts","test_products","",""
