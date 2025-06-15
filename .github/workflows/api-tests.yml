@@ -178,6 +178,11 @@ jobs:
 
       - name: Create redirect index.html
         run: |
+          # Set git user info
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Create and commit index.html
           echo '<!DOCTYPE html>
           <html lang="en">
             <head>
