@@ -170,11 +170,27 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: reports/allure/reports
-          destination_dir: allure-report
+          destination_dir: allure-report/
           keep_files: true
           force_orphan: true
           user_name: "github-actions[bot]"
           user_email: "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create redirect index.html
+        run: |
+          echo '<!DOCTYPE html>
+          <html lang="en">
+            <head>
+              <meta http-equiv="refresh" content="0; url=allure-report/">
+              <title>Redirecting to Allure Report...</title>
+            </head>
+            <body>
+              <p>Redirecting to <a href="allure-report/">Allure Report</a>...</p>
+            </body>
+          </html>' > index.html
+          git add index.html
+          git commit -m "chore: add redirect index.html to Allure report"
+          git push origin gh-pages
 
       - name: Test Results Summary
         run: |
