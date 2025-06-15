@@ -195,7 +195,10 @@ jobs:
           </html>' > index.html
           git add index.html
           git commit -m "chore: add redirect index.html to Allure report"
-          git push origin gh-pages
+
+          # Create gh-pages branch if it doesn't exist
+          git checkout -b gh-pages || git checkout gh-pages
+          git push -u origin gh-pages
 
       - name: Test Results Summary
         run: |
