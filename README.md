@@ -10,8 +10,6 @@ This is a Python-based API testing framework that uses pytest as the test runner
 
 [🔗 View Latest Test Report](https://pytest-api-test-demo.netlify.app/)
 
-[🔗 View Latest Allure Report](https://brilliant-meringue-c3cb7c.netlify.app/)
-
 ## 📋 Key Features
 
 - **Modular Design**: Clear architectural separation for easy maintenance and scalability
