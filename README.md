@@ -8,7 +8,9 @@ This is a Python-based API testing framework that uses pytest as the test runner
 
 ![Test Results Demo](assets/test_results.gif)
 
-[🔗 View Latest Test Report](https://julianwanghz.github.io/Pytest-API-Test-Demo/allure-report/)
+[🔗 View Latest Test Report](https://pytest-api-test-demo.netlify.app/)
+
+[🔗 View Latest Allure Report](https://brilliant-meringue-c3cb7c.netlify.app/)
 
 ## 📋 Key Features
 
