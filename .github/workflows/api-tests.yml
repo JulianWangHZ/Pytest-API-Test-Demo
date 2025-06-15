@@ -159,6 +159,11 @@ jobs:
       - name: Set report date env
         run: echo "REPORT_DATE=$(date +'%Y-%m-%d-%H-%M')" >> $GITHUB_ENV
 
+      - name: Clean old Allure reports (keep 60 days)
+        run: |
+          REPORTS_DIR=reports/allure/reports
+          find $REPORTS_DIR -maxdepth 1 -type d -name '20*' -mtime +60 -exec rm -rf {} +
+
       - name: Generate Allure Report
         uses: simple-elf/allure-report-action@master
         with:
