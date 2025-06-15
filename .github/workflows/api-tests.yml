@@ -159,6 +159,11 @@ jobs:
       - name: Set report date env
         run: echo "REPORT_DATE=$(date +'%Y-%m-%d-%H-%M')" >> $GITHUB_ENV
 
+      - name: Create reports directory structure
+        run: |
+          mkdir -p reports/allure/reports
+          echo "Reports directory structure created"
+
       - name: Clean old Allure reports (keep 60 days)
         run: |
           REPORTS_DIR=reports/allure/reports
