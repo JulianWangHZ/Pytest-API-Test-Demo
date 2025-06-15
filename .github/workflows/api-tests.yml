@@ -166,6 +166,19 @@ jobs:
           allure_report: reports/allure/reports/${{ env.REPORT_DATE }}
           keep_reports: 20
 
+      - name: Generate Allure Index Page
+        run: |
+          REPORTS_DIR=reports/allure/reports
+          INDEX_FILE=$REPORTS_DIR/index.html
+          echo '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Allure Reports Index</title></head><body><h1>Allure Reports</h1><ul>' > $INDEX_FILE
+          for d in $REPORTS_DIR/*/ ; do
+            dname=$(basename "$d")
+            if [ "$dname" != "latest" ]; then
+              echo "<li><a href=\"./$dname/\">$dname</a></li>" >> $INDEX_FILE
+            fi
+          done
+          echo '</ul></body></html>' >> $INDEX_FILE
+
       - name: Deploy to Netlify (date version)
         uses: nwtgck/actions-netlify@v2
         with:
@@ -176,6 +189,20 @@ jobs:
           enable-pull-request-comment: true
           enable-commit-comment: true
           overwrites-pull-request-comment: true
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+
+      - name: Deploy Allure Index to Netlify Root
+        uses: nwtgck/actions-netlify@v2
+        with:
+          publish-dir: reports/allure/reports
+          production-branch: main
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Deploy Allure index page"
+          enable-pull-request-comment: false
+          enable-commit-comment: false
+          overwrites-pull-request-comment: false
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
