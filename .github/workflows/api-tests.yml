@@ -156,20 +156,23 @@ jobs:
           pattern: test-results-*
           merge-multiple: true
 
+      - name: Set report date env
+        run: echo "REPORT_DATE=$(date +'%Y-%m-%d-%H-%M')" >> $GITHUB_ENV
+
       - name: Generate Allure Report
         uses: simple-elf/allure-report-action@master
         with:
           allure_results: reports/allure/results
-          allure_report: reports/allure/reports
+          allure_report: reports/allure/reports/${{ env.REPORT_DATE }}
           keep_reports: 20
 
-      - name: Deploy to Netlify
+      - name: Deploy to Netlify (date version)
         uses: nwtgck/actions-netlify@v2
         with:
-          publish-dir: reports/allure/reports
+          publish-dir: reports/allure/reports/${{ env.REPORT_DATE }}
           production-branch: main
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          deploy-message: "Deploy from GitHub Actions"
+          deploy-message: "Deploy Allure report ${{ env.REPORT_DATE }}"
           enable-pull-request-comment: true
           enable-commit-comment: true
           overwrites-pull-request-comment: true
