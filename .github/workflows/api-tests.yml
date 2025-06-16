@@ -160,7 +160,7 @@ jobs:
         run: |
           # Set timezone to Asia/Taipei
           export TZ='Asia/Taipei'
-          echo "REPORT_DATE=$(date +'%Y-%m-%d-%H-%M')" >> $GITHUB_ENV
+          echo "REPORT_DATE=$(date +'%Y-%m-%d-%H-%M-%S')" >> $GITHUB_ENV
 
       - name: Create reports directory structure
         run: |
@@ -230,7 +230,7 @@ jobs:
           echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Reports" >> $GITHUB_STEP_SUMMARY
-          echo "- [Allure Report](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/allure-report/)" >> $GITHUB_STEP_SUMMARY
+          echo "- [Allure Report (Netlify)](https://pytest-api-test-demo.netlify.app/)" >> $GITHUB_STEP_SUMMARY
           echo "- [Test Artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
 
   # Additional parallel job: Generate test insights
@@ -251,4 +251,4 @@ jobs:
           echo "- **Runner**: ubuntu-latest" >> $GITHUB_STEP_SUMMARY
           echo "- **Docker**: Yes" >> $GITHUB_STEP_SUMMARY
           echo "- **Parallel Execution**: Yes (Matrix Strategy)" >> $GITHUB_STEP_SUMMARY
-          echo "- **Report Generation**: Allure + GitHub Pages" >> $GITHUB_STEP_SUMMARY
+          echo "- **Report Generation**: Allure + Netlify" >> $GITHUB_STEP_SUMMARY
